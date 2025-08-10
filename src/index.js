@@ -4,7 +4,7 @@ function initMobileNavToggle() {
   const menu = document.querySelector('.navigation_menu');
   const triggerOpen  = document.querySelector('.mobile_trigger_open');   // optional, legacy
   const triggerClose = document.querySelector('.mobile_trigger_close');  // optional, legacy
-  const burger = trigger?.querySelector('.hamburger_12_wrap');           // << the hamburger
+  const burger = trigger.querySelector('.hamburger_12_wrap');           // << the hamburger
 
   if (!trigger || !menu) return;
 
@@ -17,7 +17,7 @@ function initMobileNavToggle() {
 
     if (!isMenuOpen) {
       // OPEN
-      burger?.classList.add('is-open');
+      burger.classList.add('is-open');
       trigger.setAttribute('aria-expanded', 'true');
 
       gsap.set(menu, { display: 'flex' });
