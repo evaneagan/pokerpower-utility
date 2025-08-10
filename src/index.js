@@ -1,11 +1,12 @@
 
 function initMobileNavToggle() {
   const trigger = document.querySelector('.navigation_mobile_trigger');
-  const triggerOpen = document.querySelector('.mobile_trigger_open');
-  const triggerClose = document.querySelector('.mobile_trigger_close');
   const menu = document.querySelector('.navigation_menu');
+  const triggerOpen  = document.querySelector('.mobile_trigger_open');   // optional, legacy
+  const triggerClose = document.querySelector('.mobile_trigger_close');  // optional, legacy
+  const burger = trigger?.querySelector('.hamburger_12_wrap');           // << the hamburger
 
-  if (!trigger || !menu || !triggerOpen || !triggerClose) return;
+  if (!trigger || !menu) return;
 
   let isMenuOpen = false;
   let menuAnimating = false;
@@ -15,75 +16,66 @@ function initMobileNavToggle() {
     menuAnimating = true;
 
     if (!isMenuOpen) {
-      // OPEN MENU
-      gsap.set(menu, { display: "flex" });
+      // OPEN
+      burger?.classList.add('is-open');
+      trigger.classList.add('is-open')
+      trigger.setAttribute('aria-expanded', 'true');
+
+
+      gsap.set(menu, { display: 'flex' });
       const targetHeight = menu.scrollHeight;
 
       gsap.timeline({
-        onComplete: () => {
-          isMenuOpen = true;
-          menuAnimating = false;
-        }
+        onComplete: () => { isMenuOpen = true; menuAnimating = false; }
       })
-      .fromTo(menu,
-        { height: 0, overflow: "hidden" },
-        {
-          height: targetHeight,
-          duration: 0.4,
-          ease: "power2.inOut",
-          clearProps: "height"
-        }
-      )
-      .to(triggerOpen, { autoAlpha: 0, duration: 0.3 }, 0)
+      .fromTo(menu, { height: 0, overflow: 'hidden' }, {
+        height: targetHeight, duration: 0.4, ease: 'power2.inOut', clearProps: 'height'
+      })
+      // keep if you still have separate open/close icons
+      .to(triggerOpen,  { autoAlpha: 0, duration: 0.3 }, 0)
       .to(triggerClose, { autoAlpha: 1, duration: 0.3 }, 0);
 
     } else {
-      // CLOSE MENU
-      const currentHeight = menu.offsetHeight;
+      // CLOSE
+      trigger.setAttribute('aria-expanded', 'false');
+      burger?.classList.remove('is-open'); 
+      trigger.classList.remove('is-open')
 
-      gsap.set(menu, {
-        height: currentHeight,
-        overflow: "hidden"
-      });
+      const currentHeight = menu.offsetHeight;
+      gsap.set(menu, { height: currentHeight, overflow: 'hidden' });
 
       gsap.timeline({
         onComplete: () => {
-          gsap.set(menu, {
-            clearProps: "all",
-            display: "none"
-          });
+          gsap.set(menu, { clearProps: 'all', display: 'none' });
           isMenuOpen = false;
           menuAnimating = false;
         }
       })
-      .to(menu, {
-        height: 0,
-        duration: 0.4,
-        ease: "power2.inOut"
-      })
+      .to(menu, { height: 0, duration: 0.4, ease: 'power2.inOut' })
       .to(triggerClose, { autoAlpha: 0, duration: 0.3 }, 0)
-      .to(triggerOpen, { autoAlpha: 1, duration: 0.3 }, 0);
+      .to(triggerOpen,  { autoAlpha: 1, duration: 0.3 }, 0);
     }
   };
 
-  // Trigger button click
-  trigger.addEventListener("click", () => {
-    const isVisible = window.getComputedStyle(trigger).display !== "none";
+  trigger.addEventListener('click', () => {
+    const isVisible = window.getComputedStyle(trigger).display !== 'none';
     if (isVisible) toggleMenu();
   });
 
-  // Reset state on resize (desktop breakpoint)
+  // Reset on desktop
   const observer = new ResizeObserver(() => {
-    const isVisible = window.getComputedStyle(trigger).display !== "none";
+    const isVisible = window.getComputedStyle(trigger).display !== 'none';
     if (!isVisible) {
-      gsap.set(menu, { display: "none" });
+      gsap.set(menu, { clearProps: 'all', display: 'none' });
       gsap.set(triggerOpen, { autoAlpha: 1 });
       gsap.set(triggerClose, { autoAlpha: 0 });
+      burger?.classList.remove('is-open');
+      trigger.classList.remove('is-open')
+      trigger.setAttribute('aria-expanded', 'false');
       isMenuOpen = false;
       menuAnimating = false;
     }
   });
-
   observer.observe(trigger);
 }
 
@@ -558,14 +550,13 @@ function initMobileSubmenuToggle() {
       toggleData.push({ trigger, submenu, onClick });
     });
 
-    // === Teardown: clean state on viewport change
+// === Teardown: clean state on viewport change
 return () => {
   toggleData.forEach(({ trigger, submenu, onClick }) => {
     trigger.removeEventListener('click', onClick);
     trigger.classList.remove('is-open');
     // Remove the inline styles we added on mobile
     gsap.set(submenu, { clearProps: 'height,overflow,display' }); // -> back to CSS (height:auto)
-    console.log("reset submenu")
   });
 };
   });
