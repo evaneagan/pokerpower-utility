@@ -517,6 +517,7 @@ function initMobileSubmenuToggle() {
       let isAnimating = false;
 
       const onClick = () => {
+        console.log("trigger has been clicked")
         if (isAnimating) return;
         isAnimating = true;
 
