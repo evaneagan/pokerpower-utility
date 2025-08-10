@@ -2,9 +2,7 @@
 function initMobileNavToggle() {
   const trigger = document.querySelector('.navigation_mobile_trigger');
   const menu = document.querySelector('.navigation_menu');
-  const triggerOpen  = document.querySelector('.mobile_trigger_open');   // optional, legacy
-  const triggerClose = document.querySelector('.mobile_trigger_close');  // optional, legacy
-  const burger = trigger?.querySelector('.hamburger_12_wrap');           // << the hamburger
+  const burger = trigger?.querySelector('.hamburger_12_wrap');
 
   if (!trigger || !menu) return;
 
@@ -31,9 +29,6 @@ function initMobileNavToggle() {
       .fromTo(menu, { height: 0, overflow: 'hidden' }, {
         height: targetHeight, duration: 0.4, ease: 'power2.inOut', clearProps: 'height'
       })
-      // keep if you still have separate open/close icons
-      .to(triggerOpen,  { autoAlpha: 0, duration: 0.3 }, 0)
-      .to(triggerClose, { autoAlpha: 1, duration: 0.3 }, 0);
 
     } else {
       // CLOSE
@@ -52,8 +47,6 @@ function initMobileNavToggle() {
         }
       })
       .to(menu, { height: 0, duration: 0.4, ease: 'power2.inOut' })
-      .to(triggerClose, { autoAlpha: 0, duration: 0.3 }, 0)
-      .to(triggerOpen,  { autoAlpha: 1, duration: 0.3 }, 0);
     }
   };
 
@@ -67,8 +60,6 @@ function initMobileNavToggle() {
     const isVisible = window.getComputedStyle(trigger).display !== 'none';
     if (!isVisible) {
       gsap.set(menu, { clearProps: 'all', display: 'none' });
-      gsap.set(triggerOpen, { autoAlpha: 1 });
-      gsap.set(triggerClose, { autoAlpha: 0 });
       burger?.classList.remove('is-open');
       trigger.classList.remove('is-open')
       trigger.setAttribute('aria-expanded', 'false');
@@ -254,6 +245,19 @@ function initTestimonials() {
 }
 
 function initPinnedSkills() {
+  // Check if viewport is desktop (992px and above)
+  const isDesktop = window.matchMedia('(min-width: 992px)').matches;
+  
+  if (!isDesktop) {
+    // Clean up any existing ScrollTriggers if switching from desktop to mobile
+    ScrollTrigger.getAll().forEach(trigger => {
+      if (trigger.vars.trigger && trigger.vars.trigger.closest('.section_skill')) {
+        trigger.kill();
+      }
+    });
+    return;
+  }
+
   const navOffset = document.querySelector('.navigation_wrap')?.offsetHeight || 0;
   const slides = document.querySelectorAll('.section_skill .skill_wrap');
 
@@ -289,6 +293,52 @@ function initPinnedSkills() {
       ease: 'power1.in'
     });
   });
+}
+
+// Enhanced version with resize handling
+function initPinnedSkillsWithResize() {
+  let isInitialized = false;
+
+  function handleViewportChange() {
+    const isDesktop = window.matchMedia('(min-width: 992px)').matches;
+    
+    if (isDesktop && !isInitialized) {
+      // Initialize on desktop
+      initPinnedSkills();
+      isInitialized = true;
+    } else if (!isDesktop && isInitialized) {
+      // Clean up on mobile/tablet
+      ScrollTrigger.getAll().forEach(trigger => {
+        if (trigger.vars.trigger && trigger.vars.trigger.closest('.section_skill')) {
+          trigger.kill();
+        }
+      });
+      
+      // Reset any transforms applied to elements
+      gsap.set('.section_skill .skill_layout', {
+        clearProps: 'all'
+      });
+      
+      isInitialized = false;
+    }
+  }
+
+  // Initial check
+  handleViewportChange();
+
+  // Listen for viewport changes
+  const mediaQuery = window.matchMedia('(min-width: 992px)');
+  mediaQuery.addListener(handleViewportChange);
+  
+  // Return cleanup function
+  return () => {
+    mediaQuery.removeListener(handleViewportChange);
+    ScrollTrigger.getAll().forEach(trigger => {
+      if (trigger.vars.trigger && trigger.vars.trigger.closest('.section_skill')) {
+        trigger.kill();
+      }
+    });
+  };
 }
 
 function initNavDesktop() {
