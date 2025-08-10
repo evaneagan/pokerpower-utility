@@ -558,13 +558,15 @@ function initMobileSubmenuToggle() {
     });
 
     // === Teardown: clean state on viewport change
-    return () => {
-      toggleData.forEach(({ trigger, submenu, onClick }) => {
-        trigger.removeEventListener('click', onClick);
-        trigger.classList.remove('is-open');
-        gsap.set(submenu, { height: "auto" });
-      });
-    };
+return () => {
+  toggleData.forEach(({ trigger, submenu, onClick }) => {
+    trigger.removeEventListener('click', onClick);
+    trigger.classList.remove('is-open');
+    // Remove the inline styles we added on mobile
+    gsap.set(submenu, { clearProps: 'height,overflow,display' }); // -> back to CSS (height:auto)
+    console.log("reset submenu")
+  });
+};
   });
 }
 
