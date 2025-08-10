@@ -1,3 +1,4 @@
+
 function initMobileNavToggle() {
   const trigger = document.querySelector('.navigation_mobile_trigger');
   const triggerOpen = document.querySelector('.mobile_trigger_open');
@@ -75,7 +76,7 @@ function initMobileNavToggle() {
   const observer = new ResizeObserver(() => {
     const isVisible = window.getComputedStyle(trigger).display !== "none";
     if (!isVisible) {
-      gsap.set(menu, { clearProps: "all", display: "none" });
+      gsap.set(menu, { display: "none" });
       gsap.set(triggerOpen, { autoAlpha: 1 });
       gsap.set(triggerClose, { autoAlpha: 0 });
       isMenuOpen = false;
@@ -85,7 +86,6 @@ function initMobileNavToggle() {
 
   observer.observe(trigger);
 }
-
 
 function initModalBasic() {
 
