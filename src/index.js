@@ -1,4 +1,3 @@
-
 function initMobileNavToggle() {
   const trigger = document.querySelector('.navigation_mobile_trigger');
   const triggerOpen = document.querySelector('.mobile_trigger_open');
