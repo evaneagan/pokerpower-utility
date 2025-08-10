@@ -245,101 +245,48 @@ function initTestimonials() {
 }
 
 function initPinnedSkills() {
-  // Check if viewport is desktop (992px and above)
-  const isDesktop = window.matchMedia('(min-width: 992px)').matches;
-  
-  if (!isDesktop) {
-    // Clean up any existing ScrollTriggers if switching from desktop to mobile
-    ScrollTrigger.getAll().forEach(trigger => {
-      if (trigger.vars.trigger && trigger.vars.trigger.closest('.section_skill')) {
-        trigger.kill();
-      }
-    });
-    return;
-  }
+  const mm = gsap.matchMedia();
 
-  const navOffset = document.querySelector('.navigation_wrap')?.offsetHeight || 0;
-  const slides = document.querySelectorAll('.section_skill .skill_wrap');
+  mm.add("(min-width: 992px)", () => {
+    const navOffset = document.querySelector('.navigation_wrap')?.offsetHeight || 0;
+    const slides = document.querySelectorAll('.section_skill .skill_wrap');
 
-  if (!slides.length) return;
+    if (!slides.length) return;
 
-  slides.forEach(slide => {
-    const contentWrapper = slide.querySelector('.skill_contain');
-    const content = slide.querySelector('.skill_layout');
-    if (!contentWrapper || !content) return;
+    slides.forEach(slide => {
+      const contentWrapper = slide.querySelector('.skill_contain');
+      const content = slide.querySelector('.skill_layout');
+      if (!contentWrapper || !content) return;
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        pin: contentWrapper,
-        trigger: slide,
-        start: `top-=${navOffset} top`,
-        end: () => `+=${slide.offsetHeight + window.innerHeight * 0.5}`,
-        scrub: true,
-      }
-    });
+      const tl = gsap.timeline({
+        scrollTrigger: {
+          pin: contentWrapper,
+          trigger: slide,
+          start: `top-=${navOffset} top`,
+          end: () => `+=${slide.offsetHeight + window.innerHeight * 0.5}`,
+          scrub: true,
+        }
+      });
 
-    // Buffer (dummy) tween
-    tl.to({}, { duration: 0.5 });
+      // Buffer (dummy) tween
+      tl.to({}, { duration: 0.5 });
 
-    tl.to(content, {
-      rotationZ: (Math.random() - 0.5) * 10,
-      scale: 0.7,
-      rotationX: 40,
-      ease: 'power1.in'
-    });
+      tl.to(content, {
+        rotationZ: (Math.random() - 0.5) * 10,
+        scale: 0.7,
+        rotationX: 40,
+        ease: 'power1.in'
+      });
 
-    tl.to(content, {
-      autoAlpha: 0,
-      ease: 'power1.in'
+      tl.to(content, {
+        autoAlpha: 0,
+        ease: 'power1.in'
+      });
     });
   });
 }
 
-// Enhanced version with resize handling
-function initPinnedSkillsWithResize() {
-  let isInitialized = false;
 
-  function handleViewportChange() {
-    const isDesktop = window.matchMedia('(min-width: 992px)').matches;
-    
-    if (isDesktop && !isInitialized) {
-      // Initialize on desktop
-      initPinnedSkills();
-      isInitialized = true;
-    } else if (!isDesktop && isInitialized) {
-      // Clean up on mobile/tablet
-      ScrollTrigger.getAll().forEach(trigger => {
-        if (trigger.vars.trigger && trigger.vars.trigger.closest('.section_skill')) {
-          trigger.kill();
-        }
-      });
-      
-      // Reset any transforms applied to elements
-      gsap.set('.section_skill .skill_layout', {
-        clearProps: 'all'
-      });
-      
-      isInitialized = false;
-    }
-  }
-
-  // Initial check
-  handleViewportChange();
-
-  // Listen for viewport changes
-  const mediaQuery = window.matchMedia('(min-width: 992px)');
-  mediaQuery.addListener(handleViewportChange);
-  
-  // Return cleanup function
-  return () => {
-    mediaQuery.removeListener(handleViewportChange);
-    ScrollTrigger.getAll().forEach(trigger => {
-      if (trigger.vars.trigger && trigger.vars.trigger.closest('.section_skill')) {
-        trigger.kill();
-      }
-    });
-  };
-}
 
 function initNavDesktop() {
   const mm = gsap.matchMedia();
